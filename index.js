@@ -27,9 +27,9 @@ const fs = require('fs');
             //     }
             // },
             font: {
-                color: {
-                    rgb: 'FFFFFFFF'
-                },
+                // color: {
+                //     rgb: 'FFFFFFFF'
+                // },
                 sz: 13,
                 bold: true,
                 // underline: true
@@ -104,33 +104,25 @@ const fs = require('fs');
             // Filtering month for any astric or any other text other than number
             let tempYear;
             if (sheetData[j]?.['year']) {
-                if (String(sheetData[j]?.['year']).indexOf('*') >= 0 && Number(sheetData[j]?.['year']) && String(sheetData[j]?.['year']).length <= 5) {
-                    tempYear = String(sheetData[j]?.['year']).replace('*', '');
-                } else if (Number(sheetData[j]?.['year'])) {
-                    tempYear = sheetData[j]?.['year'];
-                }
+                tempYear = tempYear = String(sheetData[j]?.['year']).replace('*', '');
             }
-            year = sheetData[j]?.['year'] ? tempYear : year;
+            year = tempYear || year;
             console.log(`Processing Year: ${year}`);
 
             // Filtering month for any astric
             let tempMonth;
-            if (sheetData[j]?.['Período']) {
-                if (String(sheetData[j]?.['Período']).indexOf('*') >= 0 || String(sheetData[j]?.['Período']).length <= 5) {
-                    tempMonth = String(sheetData[j]?.['Período']).replace('*', '');
-                } else {
-                    tempMonth = sheetData[j]?.['Período'];
-                }
+            if (sheetData[j]?.['month']) {
+                tempMonth = String(sheetData[j]?.['month']).replace('*', '');
             }
-            month = sheetData[j]?.['Período'] ? months.indexOf(tempMonth) : months.indexOf(month);
-            console.log(`Processing Year-Month: ${year}-${month}`);
+            month = tempMonth ? months.indexOf(tempMonth) : months.indexOf(month);
+            console.log(`Processing Year-Month: ${year}-${month + 1}`);
 
             if (sheetData[j]) {
                 for (const [key, value] of Object.entries(sheetData[j])) {
-                    console.log(`key: ${key}`);
+                    // console.log(`key: ${key}`);
 
                     if (key === 'year') console.log("🚀 ~ file: index.js:113 ~ key:", key, sheetData[j])
-                    if (!['year', 'name', 'Período', 'Total de patentamientos de automóviles'].includes(key)) {
+                    if (!['year', 'name', 'month', 'total'].includes(key)) {
                         const tempObject = {
                             'tipo': name,
                             'year': year,
@@ -151,7 +143,7 @@ const fs = require('fs');
     const report = excel.buildExport(
         [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
             {
-                name: 'Report', // <- Specify sheet name (optional)
+                name: 'Sheet-1', // <- Specify sheet name (optional)
                 heading: heading, // <- Raw heading array (optional)
                 merges: merges, // <- Merge cell ranges
                 specification: specification, // <- Report specification
@@ -159,5 +151,5 @@ const fs = require('fs');
             }
         ]
     );
-    fs.writeFileSync('report.xlsx', report);
+    fs.writeFileSync('patentamientos-new.xlsx', report);
 })();
